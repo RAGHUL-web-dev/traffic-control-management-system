@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrafficAI – Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #04081a;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #080d1f, #0f1630);
+            border-right: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .nav-link {
+            transition: all 0.2s;
+            border-radius: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #a5b4fc;
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            border-left-color: #6366f1;
+        }
+
+        .topbar {
+            background: rgba(8, 13, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 18px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 16px;
+        }
+
+        .badge {
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+        }
+
+        .badge-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+
+        .badge-blue {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        .badge-yellow {
+            background: rgba(234, 179, 8, 0.15);
+            color: #fde68a;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+    <aside class="sidebar w-64 flex-shrink-0 flex flex-col">
+        <div class="px-5 py-5 border-b border-indigo-950/80">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg></div>
+                <div>
+                    <p class="font-bold text-white text-sm">TrafficAI</p>
+                    <p class="text-xs text-indigo-400">Monitoring System</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mb-2 mt-1">Main</p>
+            <a href="/dashboard.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>Dashboard</a>
+            <a href="/traffic.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                </svg>Traffic Monitor</a>
+            <a href="/signals.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>Signal Control</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Violations</p>
+            <a href="/violations.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>Violations Log</a>
+            <a href="/anpr.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>ANPR Plates</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Insights</p>
+            <a href="/analytics.html"
+                class="nav-link active flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>Analytics</a>
+            <a href="/settings.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>Settings</a>
+        </nav>
+        <div class="px-4 py-4 border-t border-indigo-950/80">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold"
+                    id="avatar-initials">A</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate" id="nav-username">Admin</p>
+                    <p class="text-xs text-indigo-400" id="nav-role">Admin</p>
+                </div>
+            </div><button onclick="logout()"
+                class="w-full flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-500/10"><svg
+                    class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>Logout</button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="topbar px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+                <h1 class="text-xl font-bold text-white">Traffic Analytics</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Historical trends and performance insights</p>
+            </div>
+            <button onclick="loadAnalytics()"
+                class="px-4 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-medium transition-colors border border-indigo-500/30">↻
+                Refresh</button>
+        </header>
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="stat-card p-5">
+                    <p class="text-xs text-slate-400 mb-2">Peak Hour</p>
+                    <p class="text-2xl font-black text-yellow-400" id="an-peak">–</p>
+                    <p class="text-xs text-slate-500 mt-1">Highest traffic volume</p>
+                </div>
+                <div class="stat-card p-5">
+                    <p class="text-xs text-slate-400 mb-2">Avg Wait Time</p>
+                    <p class="text-2xl font-black text-indigo-400" id="an-wait">–</p>
+                    <p class="text-xs text-slate-500 mt-1">Seconds per vehicle</p>
+                </div>
+                <div class="stat-card p-5">
+                    <p class="text-xs text-slate-400 mb-2">Busiest Lane</p>
+                    <p class="text-2xl font-black text-green-400" id="an-lane">–</p>
+                    <p class="text-xs text-slate-500 mt-1">Current snapshot</p>
+                </div>
+                <div class="stat-card p-5">
+                    <p class="text-xs text-slate-400 mb-2">Total Violations</p>
+                    <p class="text-2xl font-black text-red-400" id="an-viols">–</p>
+                    <p class="text-xs text-slate-500 mt-1">All time</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4">Hourly Traffic Density</h2>
+                    <div class="h-56"><canvas id="hourly-chart"></canvas></div>
+                </div>
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4">Lane Comparison</h2>
+                    <div class="h-56"><canvas id="lane-chart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Hourly Data Table -->
+            <div class="card p-5">
+                <h2 class="text-sm font-semibold text-white mb-4">Hourly Breakdown Table</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/50">
+                                <th class="pb-3 text-left font-medium">Hour</th>
+                                <th class="pb-3 text-left font-medium">Vehicles</th>
+                                <th class="pb-3 text-left font-medium">Density</th>
+                                <th class="pb-3 text-left font-medium">Violations</th>
+                                <th class="pb-3 text-left font-medium">Avg Wait</th>
+                                <th class="pb-3 text-left font-medium">Period</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hourly-tbody" class="divide-y divide-slate-700/30">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-slate-500 text-xs">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        guardPage();
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.borderColor = 'rgba(99,102,241,0.1)';
+        let hourlyChartInst = null, laneChartInst = null;
+
+        function peakLabel(h) {
+            if (h >= 7 && h <= 9) return { label: 'Morning Peak', cls: 'badge-yellow' };
+            if (h >= 12 && h <= 14) return { label: 'Noon', cls: 'badge-blue' };
+            if (h >= 17 && h <= 20) return { label: 'Evening Peak', cls: 'badge-yellow' };
+            if (h < 6 || h > 22) return { label: 'Night', cls: 'badge-blue' };
+            return { label: 'Off-Peak', cls: 'badge-green' };
+        }
+
+        async function loadAnalytics() {
+            try {
+                const [summary, hourly, lanes] = await Promise.all([
+                    API.analyticsSummary(), API.analyticsHourly(), API.analyticsLanes()
+                ]);
+
+                document.getElementById("an-peak").textContent = summary.peak_hour;
+                document.getElementById("an-wait").textContent = summary.avg_wait_seconds + "s";
+                document.getElementById("an-lane").textContent = `Lane ${summary.busiest_lane}`;
+                document.getElementById("an-viols").textContent = summary.total_violations;
+
+                // Hourly chart
+                const labels = hourly.map(h => h.hour_label);
+                const densities = hourly.map(h => h.density_pct);
+                const violations = hourly.map(h => h.violations);
+                if (hourlyChartInst) hourlyChartInst.destroy();
+                hourlyChartInst = new Chart(document.getElementById("hourly-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Density %', data: densities, backgroundColor: 'rgba(99,102,241,0.6)', borderColor: '#6366f1', borderWidth: 1, borderRadius: 4 },
+                            { label: 'Violations', data: violations, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#ef4444', borderWidth: 1, borderRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } }, scales: { y: { grid: { color: 'rgba(99,102,241,0.08)' } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 12 } } } }
+                });
+
+                // Lane comparison chart
+                if (laneChartInst) laneChartInst.destroy();
+                laneChartInst = new Chart(document.getElementById("lane-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: lanes.map(l => `Lane ${l.lane_id}`),
+                        datasets: [
+                            { label: 'Total Vehicles', data: lanes.map(l => l.total_vehicles), backgroundColor: ['rgba(99,102,241,0.7)', 'rgba(139,92,246,0.7)', 'rgba(34,197,94,0.7)', 'rgba(234,179,8,0.7)'], borderRadius: 6 },
+                        ]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(99,102,241,0.08)' } }, y: { grid: { display: false } } } }
+                });
+
+                // Table
+                const tbody = document.getElementById("hourly-tbody");
+                tbody.innerHTML = hourly.map(h => {
+                    const p = peakLabel(h.hour);
+                    const dColor = h.density_pct > 70 ? '#ef4444' : h.density_pct > 40 ? '#eab308' : '#22c55e';
+                    return `<tr class="hover:bg-white/3 transition-colors">
+                <td class="py-3 pr-4 font-mono text-indigo-300 text-xs">${h.hour_label}</td>
+                <td class="py-3 pr-4 text-slate-300 font-semibold text-xs">${h.total_vehicles}</td>
+                <td class="py-3 pr-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:${h.density_pct}%;background:${dColor}"></div></div>
+                        <span class="text-xs font-mono" style="color:${dColor}">${h.density_pct}%</span>
+                    </div>
+                </td>
+                <td class="py-3 pr-4 text-xs ${h.violations > 5 ? 'text-red-400' : 'text-slate-400'} font-medium">${h.violations}</td>
+                <td class="py-3 pr-4 text-xs text-slate-400">${h.avg_wait_seconds}s</td>
+                <td class="py-3"><span class="badge ${p.cls}">${p.label}</span></td>
+            </tr>`;
+                }).join("");
+            } catch (e) { console.error(e); }
+        }
+        loadAnalytics();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrafficAI – Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #04081a;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #080d1f, #0f1630);
+            border-right: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .nav-link {
+            transition: all 0.2s;
+            border-radius: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #a5b4fc;
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            border-left-color: #6366f1;
+        }
+
+        .topbar {
+            background: rgba(8, 13, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 18px;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 14px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(99, 102, 241, 0.3);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .toggle-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .toggle-wrap input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-track {
+            width: 44px;
+            height: 24px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s;
+        }
+
+        .toggle-wrap input:checked+.toggle-track {
+            background: rgba(99, 102, 241, 0.7);
+            border-color: #6366f1;
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-wrap input:checked~.toggle-thumb {
+            transform: translateX(20px);
+            background: #a5b4fc;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+    <aside class="sidebar w-64 flex-shrink-0 flex flex-col">
+        <div class="px-5 py-5 border-b border-indigo-950/80">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg></div>
+                <div>
+                    <p class="font-bold text-white text-sm">TrafficAI</p>
+                    <p class="text-xs text-indigo-400">Monitoring System</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mb-2 mt-1">Main</p>
+            <a href="/dashboard.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>Dashboard</a>
+            <a href="/traffic.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                </svg>Traffic Monitor</a>
+            <a href="/signals.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>Signal Control</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Violations</p>
+            <a href="/violations.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>Violations Log</a>
+            <a href="/anpr.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>ANPR Plates</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Insights</p>
+            <a href="/analytics.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>Analytics</a>
+            <a href="/settings.html"
+                class="nav-link active flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>Settings</a>
+        </nav>
+        <div class="px-4 py-4 border-t border-indigo-950/80">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold"
+                    id="avatar-initials">A</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate" id="nav-username">Admin</p>
+                    <p class="text-xs text-indigo-400" id="nav-role">Admin</p>
+                </div>
+            </div><button onclick="logout()"
+                class="w-full flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-500/10"><svg
+                    class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>Logout</button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="topbar px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+                <h1 class="text-xl font-bold text-white">System Settings</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Configure detection thresholds and signal parameters</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500" id="last-saved">–</span>
+                <button onclick="saveSettings()"
+                    class="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-semibold transition-colors">Save
+                    Settings</button>
+            </div>
+        </header>
+        <main class="flex-1 overflow-y-auto p-6">
+            <div class="max-w-2xl mx-auto space-y-5">
+                <div id="save-msg"
+                    class="hidden flex items-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>Settings saved successfully!</div>
+
+                <!-- Simulation -->
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><svg
+                            class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>Simulation Control</h2>
+                    <div class="section-card p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-300 font-medium">Traffic Simulation</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Run/stop the simulated traffic detection engine
+                                </p>
+                            </div>
+                            <label class="toggle-wrap">
+                                <input type="checkbox" id="sim-running" checked />
+                                <div class="toggle-track"></div>
+                                <div class="toggle-thumb"></div>
+                            </label>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-300 font-medium">Empty Lane Skip</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Skip empty lanes during signal allocation</p>
+                            </div>
+                            <label class="toggle-wrap">
+                                <input type="checkbox" id="empty-skip" checked />
+                                <div class="toggle-track"></div>
+                                <div class="toggle-thumb"></div>
+                            </label>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-xs text-slate-400 mb-1.5">Snapshot Interval (seconds)</label>
+                            <input type="number" id="snap-interval" min="5" max="300" value="30" class="w-32" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection -->
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><svg
+                            class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>Detection Thresholds</h2>
+                    <div class="section-card p-4 space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm text-slate-300">Vehicle Detection Confidence</label>
+                                <span class="text-indigo-400 font-mono text-sm font-bold" id="det-val">65%</span>
+                            </div>
+                            <input type="range" id="det-threshold" min="30" max="99" value="65" class="w-full"
+                                oninput="document.getElementById('det-val').textContent=this.value+'%'" />
+                            <div class="flex justify-between text-xs text-slate-600 mt-1">
+                                <span>30%</span><span>99%</span></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm text-slate-300">OCR Confidence Threshold</label>
+                                <span class="text-indigo-400 font-mono text-sm font-bold" id="ocr-val">75%</span>
+                            </div>
+                            <input type="range" id="ocr-threshold" min="50" max="99" value="75" class="w-full"
+                                oninput="document.getElementById('ocr-val').textContent=this.value+'%'" />
+                            <div class="flex justify-between text-xs text-slate-600 mt-1">
+                                <span>50%</span><span>99%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signal Timing -->
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><svg
+                            class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>Signal Timing</h2>
+                    <div class="section-card p-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5">Min Green Time (sec)</label>
+                            <input type="number" id="min-green" min="5" max="60" value="15" class="w-full" />
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5">Max Green Time (sec)</label>
+                            <input type="number" id="max-green" min="30" max="180" value="90" class="w-full" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Upload -->
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><svg
+                            class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>Video / Image Upload</h2>
+                    <div class="section-card p-4">
+                        <p class="text-xs text-slate-500 mb-3">Upload video feeds or evidence images for processing.
+                            Navigate to <a href="/traffic.html" class="text-indigo-400 hover:text-indigo-300">Traffic
+                                Monitor</a> to upload lane-specific feeds.</p>
+                        <label
+                            class="flex flex-col items-center justify-center border-2 border-dashed border-indigo-500/25 rounded-xl p-8 cursor-pointer hover:border-indigo-500/50 transition-colors">
+                            <svg class="w-10 h-10 text-slate-600 mb-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span class="text-sm text-slate-400">Drop file or click to upload</span>
+                            <span class="text-xs text-slate-600 mt-1">MP4, AVI, MOV, JPG, PNG</span>
+                            <input type="file" accept="video/*,image/*" class="hidden"
+                                onchange="handleFileUpload(event)" />
+                        </label>
+                        <p id="upload-status" class="text-xs text-green-400 mt-2 hidden"></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        guardPage();
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const status = document.getElementById("upload-status");
+            status.textContent = `✓ File "${file.name}" (${(file.size / 1024 / 1024).toFixed(1)}MB) ready for processing`;
+            status.classList.remove("hidden");
+        }
+
+        async function loadSettings() {
+            try {
+                const s = await API.getSettings();
+                document.getElementById("sim-running").checked = !!s.simulation_running;
+                document.getElementById("empty-skip").checked = !!s.empty_lane_skip;
+                document.getElementById("snap-interval").value = s.snapshot_interval_seconds || 30;
+                const detPct = Math.round((s.detection_threshold || 0.65) * 100);
+                document.getElementById("det-threshold").value = detPct;
+                document.getElementById("det-val").textContent = detPct + "%";
+                document.getElementById("ocr-threshold").value = Math.round(s.ocr_confidence_threshold || 75);
+                document.getElementById("ocr-val").textContent = Math.round(s.ocr_confidence_threshold || 75) + "%";
+                document.getElementById("min-green").value = s.min_green_time || 15;
+                document.getElementById("max-green").value = s.max_green_time || 90;
+                if (s.updated_at) document.getElementById("last-saved").textContent = `Last saved: ${new Date(s.updated_at).toLocaleString()}`;
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveSettings() {
+            const body = {
+                simulation_running: document.getElementById("sim-running").checked,
+                empty_lane_skip: document.getElementById("empty-skip").checked,
+                snapshot_interval_seconds: parseInt(document.getElementById("snap-interval").value),
+                detection_threshold: parseInt(document.getElementById("det-threshold").value) / 100,
+                ocr_confidence_threshold: parseInt(document.getElementById("ocr-threshold").value),
+                min_green_time: parseInt(document.getElementById("min-green").value),
+                max_green_time: parseInt(document.getElementById("max-green").value),
+            };
+            try {
+                await API.updateSettings(body);
+                const msg = document.getElementById("save-msg");
+                msg.classList.remove("hidden");
+                document.getElementById("last-saved").textContent = `Last saved: ${new Date().toLocaleString()}`;
+                setTimeout(() => msg.classList.add("hidden"), 3000);
+            } catch (e) { alert("Save failed: " + e.message); }
+        }
+
+        loadSettings();
+    </script>
+</body>
+
+</html>

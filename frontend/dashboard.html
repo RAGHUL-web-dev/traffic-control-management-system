@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrafficAI – Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #04081a;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #080d1f, #0f1630);
+            border-right: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .nav-link {
+            transition: all 0.2s;
+            border-radius: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #a5b4fc;
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            border-left-color: #6366f1;
+        }
+
+        .topbar {
+            background: rgba(8, 13, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 18px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+        }
+
+        .video-placeholder {
+            background: linear-gradient(135deg, #0d1426, #111927);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-overlay {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+        }
+
+        .badge {
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+        }
+
+        .badge-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+
+        .badge-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .badge-yellow {
+            background: rgba(234, 179, 8, 0.15);
+            color: #fde68a;
+        }
+
+        .badge-blue {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        .pulse-dot {
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        .signal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar w-64 flex-shrink-0 flex flex-col">
+        <div class="px-5 py-5 border-b border-indigo-950/80">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold text-white text-sm">TrafficAI</p>
+                    <p class="text-xs text-indigo-400">Monitoring System</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mb-2 mt-1">Main</p>
+            <a href="/dashboard.html"
+                class="nav-link active flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300"><svg
+                    class="w-4.5 h-4.5 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>Dashboard</a>
+            <a href="/traffic.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                </svg>Traffic Monitor</a>
+            <a href="/signals.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>Signal Control</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Violations</p>
+            <a href="/violations.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>Violations Log</a>
+            <a href="/anpr.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>ANPR Plates</a>
+            <p class="text-xs text-indigo-500/70 font-semibold uppercase tracking-widest px-3 mt-4 mb-2">Insights</p>
+            <a href="/analytics.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>Analytics</a>
+            <a href="/settings.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400"><svg
+                    class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>Settings</a>
+        </nav>
+        <div class="px-4 py-4 border-t border-indigo-950/80">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold"
+                    id="avatar-initials">A</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate" id="nav-username">Admin</p>
+                    <p class="text-xs text-indigo-400" id="nav-role">Admin</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-500/10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="topbar px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+                <h1 class="text-xl font-bold text-white">Dashboard</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Real-time traffic intelligence overview</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <div class="pulse-dot w-2 h-2 rounded-full bg-green-400"></div><span
+                        class="text-xs text-green-400 font-medium">Live</span>
+                </div>
+                <div class="text-xs text-slate-500 font-mono" id="clock">--:--:--</div>
+                <button onclick="loadAll()"
+                    class="px-4 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-medium transition-colors border border-indigo-500/30">↻
+                    Refresh</button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="stat-card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center"><svg
+                                class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg></div>
+                        <span class="badge badge-blue">Live</span>
+                    </div>
+                    <p class="text-2xl font-black text-white" id="card-total-vehicles">–</p>
+                    <p class="text-xs text-slate-400 mt-1">Total Vehicles Detected</p>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center"><svg
+                                class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg></div>
+                        <span class="badge badge-red">Today</span>
+                    </div>
+                    <p class="text-2xl font-black text-white" id="card-total-violations">–</p>
+                    <p class="text-xs text-slate-400 mt-1">Total Violations</p>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center"><svg
+                                class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg></div>
+                        <span class="badge badge-green">Active</span>
+                    </div>
+                    <p class="text-2xl font-black text-green-400" id="card-active-lane">–</p>
+                    <p class="text-xs text-slate-400 mt-1">Active Signal Lane</p>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-yellow-500/15 flex items-center justify-center"><svg
+                                class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg></div>
+                        <span class="badge badge-yellow">Avg</span>
+                    </div>
+                    <p class="text-2xl font-black text-white" id="card-avg-density">–</p>
+                    <p class="text-xs text-slate-400 mt-1">Avg Traffic Density</p>
+                </div>
+            </div>
+
+            <!-- Video Grid + Signal Panel -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <!-- 2x2 Video Grid -->
+                <div class="xl:col-span-2 card p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold text-white">Live Camera Feeds</h2>
+                        <span class="badge badge-green">4 Cameras Active</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3" id="video-grid">
+                        <!-- Lanes inserted by JS -->
+                    </div>
+                </div>
+                <!-- Signal Panel -->
+                <div class="card p-5">
+                    <h2 class="text-sm font-semibold text-white mb-4">Signal Status</h2>
+                    <div id="signal-panel" class="space-y-3">
+                        <div class="text-slate-500 text-xs text-center py-8">Loading…</div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-slate-700/30">
+                        <p class="text-xs text-slate-500 mb-1">Active Lane Reason</p>
+                        <p class="text-xs text-indigo-300 font-medium" id="signal-reason-small">–</p>
+                        <p class="text-xs text-green-400 mt-2 font-mono" id="green-time-small">– sec green</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Violations -->
+            <div class="card p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-white">Recent Violations</h2>
+                    <a href="/violations.html"
+                        class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View all →</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/50">
+                                <th class="pb-3 text-left font-medium">Plate</th>
+                                <th class="pb-3 text-left font-medium">Type</th>
+                                <th class="pb-3 text-left font-medium">Vehicle</th>
+                                <th class="pb-3 text-left font-medium">Lane</th>
+                                <th class="pb-3 text-left font-medium">Time</th>
+                                <th class="pb-3 text-left font-medium">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-violations" class="divide-y divide-slate-700/30">
+                            <tr>
+                                <td colspan="6" class="py-6 text-center text-slate-500 text-xs">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Violation Detail Modal -->
+    <div id="v-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="relative glass rounded-3xl p-6 w-full max-w-md z-10"
+            style="background:rgba(15,23,42,0.95);border:1px solid rgba(99,102,241,0.2)">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+            <h3 class="text-lg font-bold text-white mb-4">Violation Detail</h3>
+            <div id="modal-body" class="space-y-3 text-sm"></div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        guardPage();
+
+        // Clock
+        setInterval(() => {
+            document.getElementById("clock").textContent = new Date().toLocaleTimeString();
+        }, 1000);
+
+        function statusBadge(s) {
+            const m = { Pending: 'badge-yellow', Reviewed: 'badge-blue', 'Challan Issued': 'badge-red' };
+            return `<span class="badge ${m[s] || 'badge-blue'}">${s}</span>`;
+        }
+
+        function buildVideoGrid(lanes) {
+            const grid = document.getElementById("video-grid");
+            grid.innerHTML = lanes.map(l => {
+                const pct = l.density_pct;
+                const color = pct > 70 ? '#ef4444' : pct > 40 ? '#eab308' : '#22c55e';
+                const label = pct > 70 ? 'HIGH' : pct > 40 ? 'MED' : 'LOW';
+                return `<div class="video-placeholder aspect-video flex flex-col items-center justify-center relative cursor-pointer hover:border-indigo-400/40 transition-all">
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <svg class="w-12 h-12 text-slate-700 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+                <p class="text-xs text-slate-600">Upload Video</p>
+            </div>
+            <!-- top bar -->
+            <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-2">
+                <span class="text-xs font-bold text-white bg-black/60 px-2 py-0.5 rounded">Lane ${l.lane_id}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded" style="background:rgba(0,0,0,0.6);color:${color}">${label}</span>
+            </div>
+            <!-- bottom overlay -->
+            <div class="video-overlay absolute bottom-0 left-0 right-0 px-3 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span class="text-xs text-white font-semibold">${l.total_vehicles} vehicles</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${color}"></div></div>
+                    <span class="text-xs font-mono" style="color:${color}">${pct}%</span>
+                </div>
+            </div>
+            ${l.is_empty ? '<div class="absolute inset-0 flex items-center justify-center"><span class="badge badge-red text-xs font-bold">EMPTY LANE</span></div>' : ''}
+        </div>`;
+            }).join("");
+        }
+
+        async function loadAll() {
+            try {
+                const [snap, sig, violations, summary] = await Promise.all([
+                    API.trafficSnapshot(),
+                    API.currentSignal(),
+                    API.violations({ limit: 10 }),
+                    API.analyticsSummary()
+                ]);
+
+                // Cards
+                const totalV = snap.lanes.reduce((s, l) => s + l.total_vehicles, 0);
+                const avgD = Math.round(snap.lanes.reduce((s, l) => s + l.density_pct, 0) / snap.lanes.length);
+                document.getElementById("card-total-vehicles").textContent = totalV.toLocaleString();
+                document.getElementById("card-total-violations").textContent = summary.total_violations;
+                document.getElementById("card-active-lane").textContent = `Lane ${sig.active_lane}`;
+                document.getElementById("card-avg-density").textContent = `${avgD}%`;
+
+                // Video grid
+                buildVideoGrid(snap.lanes);
+
+                // Signal panel
+                const panel = document.getElementById("signal-panel");
+                panel.innerHTML = snap.lanes.map(l => {
+                    const isActive = l.lane_id === sig.active_lane;
+                    return `<div class="flex items-center justify-between p-3 rounded-xl ${isActive ? 'bg-green-500/10 border border-green-500/25' : 'bg-slate-800/40'}">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-3 h-3 rounded-full ${isActive ? 'bg-green-400 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : l.is_empty ? 'bg-red-400' : 'bg-slate-600'}"></div>
+                    <span class="text-sm ${isActive ? 'text-green-300 font-semibold' : 'text-slate-400'}">Lane ${l.lane_id}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500">${l.total_vehicles}v</span>
+                    <span class="badge ${isActive ? 'badge-green' : l.is_empty ? 'badge-red' : 'badge-blue'}">${isActive ? 'GREEN' : l.is_empty ? 'EMPTY' : 'RED'}</span>
+                </div>
+            </div>`;
+                }).join("");
+                document.getElementById("signal-reason-small").textContent = sig.reason;
+                document.getElementById("green-time-small").textContent = `${sig.green_time_seconds}s green time`;
+
+                // Violations table
+                const tbody = document.getElementById("recent-violations");
+                if (!violations.length) { tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">No violations</td></tr>'; return; }
+                tbody.innerHTML = violations.slice(0, 8).map(v => `
+            <tr class="hover:bg-white/3 transition-colors cursor-pointer" onclick="showModal('${v._id}')">
+                <td class="py-3 pr-3"><span class="font-mono text-xs bg-slate-800 px-2 py-1 rounded text-indigo-300">${v.plate_number}</span></td>
+                <td class="py-3 pr-3 text-xs text-slate-300">${v.violation_type}</td>
+                <td class="py-3 pr-3 text-xs text-slate-400">${v.vehicle_type}</td>
+                <td class="py-3 pr-3"><span class="badge badge-blue">Lane ${v.lane_id}</span></td>
+                <td class="py-3 pr-3 text-xs text-slate-500">${new Date(v.timestamp).toLocaleString()}</td>
+                <td class="py-3">${statusBadge(v.status)}</td>
+            </tr>`).join("");
+            } catch (e) { console.error(e); }
+        }
+
+        async function showModal(id) {
+            try {
+                const v = await API.violationDetail(id);
+                document.getElementById("modal-body").innerHTML = `
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Plate</p><p class="font-mono font-bold text-indigo-300">${v.plate_number}</p></div>
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Status</p>${statusBadge(v.status)}</div>
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Violation</p><p class="text-xs text-red-300">${v.violation_type}</p></div>
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Vehicle</p><p class="text-xs text-slate-300">${v.vehicle_type}</p></div>
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Lane</p><p class="text-xs text-slate-300">Lane ${v.lane_id}</p></div>
+                <div class="bg-slate-800/50 rounded-xl p-3"><p class="text-xs text-slate-500 mb-1">Time</p><p class="text-xs text-slate-300">${new Date(v.timestamp).toLocaleString()}</p></div>
+            </div>
+            <div class="bg-slate-800/50 rounded-xl p-3 mt-1"><p class="text-xs text-slate-500 mb-2">Evidence Image</p><div class="h-32 bg-slate-900 rounded-lg flex items-center justify-center"><p class="text-xs text-slate-600 font-mono">${v.image_path}</p></div></div>`;
+                document.getElementById("v-modal").classList.remove("hidden");
+            } catch (e) { console.error(e); }
+        }
+        function closeModal() { document.getElementById("v-modal").classList.add("hidden"); }
+
+        loadAll();
+        setInterval(loadAll, 20000);
+    </script>
+</body>
+
+</html>
