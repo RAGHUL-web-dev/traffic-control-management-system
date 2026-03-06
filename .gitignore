@@ -1,0 +1,34 @@
+# Virtual Environment
+venv/
+backend/venv/
+ENV/
+env/
+.env
+
+# Python Cache
+__pycache__/
+backend/__pycache__/
+backend/routes/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Computer Vision Assets
+yolov8n.pt
+backend/yolov8n.pt
+
+# User Uploads and Evidence
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/violations/*
+!backend/violations/.gitkeep
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo

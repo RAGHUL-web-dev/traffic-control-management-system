@@ -39,6 +39,17 @@ const API = {
     // Traffic
     trafficSnapshot: () => apiFetch("/traffic/snapshot"),
     trafficHistory: (limit = 20) => apiFetch(`/traffic/history?limit=${limit}`),
+    uploadLaneVideo: (file, laneId) => {
+        const formData = new FormData();
+        formData.append("video", file);
+        if (laneId) formData.append("lane_id", laneId);
+        return fetch(BASE + "/traffic/lanes", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${getToken()}` }, // No Content-Type, let browser set boundary
+            body: formData
+        }).then(res => res.json());
+    },
+    removeLane: (laneId) => apiFetch(`/traffic/lanes/${laneId}`, { method: "DELETE" }),
 
     // Signals
     currentSignal: () => apiFetch("/signals/current"),

@@ -20,8 +20,8 @@ def summary():
     # Latest snapshot lane stats
     snap = snapshots_col.find_one(sort=[("timestamp", -1)])
     busiest_lane = 1
-    if snap:
-        busiest_lane = max(snap["lanes"], key=lambda l: l["total_vehicles"])["lane_id"]
+    if snap and snap.get("lanes"):
+        busiest_lane = max(snap["lanes"], key=lambda l: l.get("count", l.get("total_vehicles", 0))).get("lane", 1)
     return jsonify({
         "total_violations": total_violations,
         "total_snapshots": total_snapshots,
@@ -45,11 +45,15 @@ def lane_comparison():
     if not snap:
         return jsonify([])
     result = []
-    for lane in snap["lanes"]:
+    
+    # Check if 'lanes' exists in snapshot
+    lanes_data = snap.get("lanes", [])
+    
+    for lane in lanes_data:
         result.append({
-            "lane_id": lane["lane_id"],
-            "total_vehicles": lane["total_vehicles"],
-            "density_pct": lane["density_pct"],
-            "vehicle_counts": lane["vehicle_counts"]
+            "lane_id": lane.get("lane", lane.get("lane_id", "Unknown")),
+            "total_vehicles": lane.get("count", 0),
+            "density_pct": lane.get("density", 0),
+            "vehicle_counts": {"Car": lane.get("count", 0)} # Simplified for now
         })
     return jsonify(result)

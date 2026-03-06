@@ -9,12 +9,18 @@ from routes.anpr import anpr_bp
 from routes.analytics import analytics_bp
 from routes.settings import settings_bp
 
+from cv_engine import start_cv_engine
+from config import UPLOAD_FOLDER
+
 # ── Frontend static path ──────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 CORS(app)
+
+# Start Computer Vision Engine
+start_cv_engine()
 
 # ── Register API blueprints ───────────────────────────────────────────────────
 app.register_blueprint(auth_bp,       url_prefix="/api/auth")
@@ -33,6 +39,10 @@ def index():
 @app.route("/<path:path>")
 def static_proxy(path):
     return send_from_directory(FRONTEND_DIR, path)
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 if __name__ == "__main__":
     print("🚦 TrafficAI backend starting on http://localhost:5000")
