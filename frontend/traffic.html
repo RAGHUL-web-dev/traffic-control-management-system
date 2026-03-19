@@ -19,7 +19,7 @@
             background: linear-gradient(135deg, #0d1426, #111927); 
             border-radius: 14px; 
             overflow: hidden; 
-            position: relative; 
+            position: relative;
             aspect-ratio: 16/9; 
             transition: border 0.3s ease;
         }
@@ -35,9 +35,100 @@
         @keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: 0.3 } }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 2px; }
         input[type="file"] { display: none; }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
+
+    <!-- Modal Overlay - Future Enhancement -->
+    <div class="modal-overlay" id="cctvModal">
+        <div class="modal-content relative p-8 text-center">
+            <button onclick="closeCCTVModal()" class="modal-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <div class="feature-icon">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </div>
+            
+            <h3 class="text-xl font-bold text-white mb-2">CCTV Integration</h3>
+            <p class="text-slate-400 text-sm mb-6">
+                Live CCTV feed integration is coming soon!<br>
+                You'll be able to connect and monitor multiple CCTV cameras directly.
+            </p>
+            
+            <button onclick="closeCCTVModal()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors">
+                Got it
+            </button>
+        </div>
+    </div>
 
     <!-- Sidebar -->
     <aside class="sidebar w-64 flex-shrink-0 flex flex-col">
@@ -82,6 +173,13 @@
                 <div class="flex items-center gap-2">
                     <div class="pulse-dot w-2 h-2 rounded-full bg-green-400"></div><span class="text-xs text-green-400 font-medium">CV Engine Active</span>
                 </div>
+                <!-- New CCTV Footage Button -->
+                <button onclick="openCCTVModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Add CCTV Footage
+                </button>
                 <button onclick="document.getElementById('new-file').click()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors">+ Add New Lane</button>
                 <input type="file" accept="video/*" id="new-file" onchange="uploadNewLane(event)">
             </div>
@@ -135,6 +233,29 @@
 
         function densityColor(pct) { return pct > 70 ? '#ef4444' : pct > 40 ? '#eab308' : '#22c55e'; }
         function densityLabel(pct) { return pct > 70 ? 'HIGH' : pct > 40 ? 'MEDIUM' : 'LOW'; }
+
+        // Modal Functions
+        function openCCTVModal() {
+            document.getElementById('cctvModal').classList.add('active');
+        }
+
+        function closeCCTVModal() {
+            document.getElementById('cctvModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('cctvModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCCTVModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCCTVModal();
+            }
+        });
 
         async function uploadNewLane(e) {
             const file = e.target.files[0];

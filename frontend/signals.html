@@ -141,10 +141,116 @@
             outline: none;
             border-color: #6366f1;
         }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 8, 26, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background: linear-gradient(135deg, #111827, #0f1729);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .loading-overlay.active .loading-content {
+            transform: scale(1);
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-radius: 50%;
+            border-top-color: #6366f1;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .pulse-dot-small {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #6366f1;
+            margin: 0 2px;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .pulse-dot-small:nth-child(2) { animation-delay: 0.2s; }
+        .pulse-dot-small:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.3; }
+            30% { transform: scale(1.5); opacity: 1; }
+        }
     </style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 class="text-lg font-semibold text-white mb-2">Refreshing Signal Data</h3>
+            <p class="text-sm text-slate-400 mb-3">Fetching latest traffic signal information...</p>
+            <div class="flex justify-center gap-1 mb-3">
+                <span class="pulse-dot-small"></span>
+                <span class="pulse-dot-small"></span>
+                <span class="pulse-dot-small"></span>
+            </div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgress"></div>
+            </div>
+            <p class="text-xs text-indigo-400 mt-3" id="loadingStatus">Initializing signal systems...</p>
+        </div>
+    </div>
+
     <aside class="sidebar w-64 flex-shrink-0 flex flex-col">
         <div class="px-5 py-5 border-b border-indigo-950/80">
             <div class="flex items-center gap-3">
@@ -232,9 +338,13 @@
                     <div class="pulse-dot w-2 h-2 rounded-full bg-green-400"></div><span
                         class="text-xs text-green-400 font-medium">CV Auto Mode</span>
                 </div>
-                <button onclick="loadAll()"
-                    class="px-4 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-medium transition-colors border border-indigo-500/30">↻
-                    Refresh</button>
+                <button onclick="refreshWithAnimation()"
+                    class="px-4 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-medium transition-colors border border-indigo-500/30 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                </button>
             </div>
         </header>
         <main class="flex-1 overflow-y-auto p-6 space-y-6">
@@ -324,66 +434,128 @@
     <script>
         guardPage();
 
-        async function loadAll() {
+        // Loading animation function
+        function showLoadingAnimation(duration = 3000) {
+            const overlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('loadingProgress');
+            const statusText = document.getElementById('loadingStatus');
+            
+            // Reset progress
+            progressBar.style.width = '0%';
+            
+            // Show overlay
+            overlay.classList.add('active');
+            
+            // Update status messages and progress
+            const startTime = Date.now();
+            const interval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min((elapsed / duration) * 100, 100);
+                
+                progressBar.style.width = progress + '%';
+                
+                // Update status message based on progress
+                if (progress < 25) {
+                    statusText.textContent = 'Connecting to traffic control...';
+                } else if (progress < 50) {
+                    statusText.textContent = 'Fetching signal data...';
+                } else if (progress < 75) {
+                    statusText.textContent = 'Analyzing lane priorities...';
+                } else {
+                    statusText.textContent = 'Updating display...';
+                }
+                
+                if (elapsed >= duration) {
+                    clearInterval(interval);
+                }
+            }, 100);
+            
+            // Hide overlay after duration
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, duration);
+        }
+
+        async function refreshWithAnimation() {
+            // Show loading animation
+            showLoadingAnimation(3000);
+            
             try {
+                // Fetch new data
                 const [sig, snap, hist] = await Promise.all([
-                    API.currentSignal(), API.trafficSnapshot(), API.signalHistory(30)
+                    API.currentSignal(), 
+                    API.trafficSnapshot(), 
+                    API.signalHistory(30)
                 ]);
+                
+                // Wait for animation to complete before rendering
+                setTimeout(() => {
+                    updateUI(sig, snap, hist);
+                }, 3000);
+                
+            } catch (e) { 
+                console.error(e);
+                // Hide overlay if there's an error
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('Failed to refresh data: ' + e.message);
+            }
+        }
 
-                const configuredLanes = snap.configured_lanes || [];
-                const scores = sig.cycle_scores || [];
-                const overrideSelect = document.getElementById("ovr-lane");
+        function updateUI(sig, snap, hist) {
+            const configuredLanes = snap.configured_lanes || [];
+            const scores = sig.cycle_scores || [];
+            const overrideSelect = document.getElementById("ovr-lane");
 
-                // Update dropdown
-                overrideSelect.innerHTML = configuredLanes.map(l => `<option value="${l.lane_id}">Lane ${l.lane_id}</option>`).join("");
+            // Update dropdown
+            overrideSelect.innerHTML = configuredLanes.map(l => `<option value="${l.lane_id}">Lane ${l.lane_id}</option>`).join("");
 
-                // Signal lights grid
-                const lightsGrid = document.getElementById("lights-grid");
-                lightsGrid.innerHTML = configuredLanes.map(l => {
-                    const isActive = (String(l.lane_id) === String(sig.active_lane));
-                    return `
-                        <div class="flex flex-col items-center gap-2">
-                            <div class="sig-light ${isActive ? 'sig-green' : 'sig-red'}"></div>
-                            <span class="text-xs text-slate-400 font-bold">L${l.lane_id}</span>
+            // Signal lights grid
+            const lightsGrid = document.getElementById("lights-grid");
+            lightsGrid.innerHTML = configuredLanes.map(l => {
+                const isActive = (String(l.lane_id) === String(sig.active_lane));
+                return `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="sig-light ${isActive ? 'sig-green' : 'sig-red'}"></div>
+                        <span class="text-xs text-slate-400 font-bold">L${l.lane_id}</span>
+                    </div>
+                `;
+            }).join("");
+
+            document.getElementById("active-lane-txt").textContent = `Lane ${sig.active_lane || '-'} 🟢`;
+            document.getElementById("sig-reason-txt").textContent = sig.reason || '';
+            document.getElementById("sig-green-time").textContent = `${sig.duration || sig.green_time_seconds || 0}s allocated duration`;
+
+            // Lane grid
+            const lg = document.getElementById("lane-grid");
+            lg.innerHTML = configuredLanes.map(l => {
+                const isActive = String(l.lane_id) === String(sig.active_lane);
+                const s = scores.find(x => String(x.lane_id) === String(l.lane_id)) || { v_count: 0, wait_time: 0, score: 0, cooldown: false };
+
+                return `
+                <tr class="hover:bg-white/3 transition-colors ${isActive ? 'bg-green-500/5' : ''}">
+                    <td class="py-3 pr-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}"></div>
+                            <span class="text-sm font-bold ${isActive ? 'text-green-300' : 'text-slate-300'}">Lane ${l.lane_id}</span>
                         </div>
-                    `;
-                }).join("");
+                    </td>
+                    <td class="py-3 pr-4 font-bold text-indigo-300">${s.v_count}</td>
+                    <td class="py-3 pr-4 text-slate-400 font-mono">${s.wait_time}s</td>
+                    <td class="py-3 pr-4">
+                        <span class="font-mono ${isActive ? 'text-green-300' : 'text-slate-300'}">${s.score.toFixed(1)}</span>
+                    </td>
+                    <td class="py-3 pr-4">
+                        ${s.cooldown ? '<span class="badge badge-yellow">COOLING</span>' : '<span class="badge bg-slate-700 text-slate-400">READY</span>'}
+                    </td>
+                    <td class="py-3">
+                        <span class="badge ${isActive ? 'badge-green' : 'badge-red'}">${isActive ? 'GREEN' : 'RED'}</span>
+                    </td>
+                </tr>`;
+            }).join("");
 
-                document.getElementById("active-lane-txt").textContent = `Lane ${sig.active_lane || '-'} 🟢`;
-                document.getElementById("sig-reason-txt").textContent = sig.reason || '';
-                document.getElementById("sig-green-time").textContent = `${sig.duration || sig.green_time_seconds || 0}s allocated duration`;
-
-                // Lane grid
-                const lg = document.getElementById("lane-grid");
-                lg.innerHTML = configuredLanes.map(l => {
-                    const isActive = String(l.lane_id) === String(sig.active_lane);
-                    const s = scores.find(x => String(x.lane_id) === String(l.lane_id)) || { v_count: 0, wait_time: 0, score: 0, cooldown: false };
-
-                    return `
-                    <tr class="hover:bg-white/3 transition-colors ${isActive ? 'bg-green-500/5' : ''}">
-                        <td class="py-3 pr-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}"></div>
-                                <span class="text-sm font-bold ${isActive ? 'text-green-300' : 'text-slate-300'}">Lane ${l.lane_id}</span>
-                            </div>
-                        </td>
-                        <td class="py-3 pr-4 font-bold text-indigo-300">${s.v_count}</td>
-                        <td class="py-3 pr-4 text-slate-400 font-mono">${s.wait_time}s</td>
-                        <td class="py-3 pr-4">
-                            <span class="font-mono ${isActive ? 'text-green-300' : 'text-slate-300'}">${s.score.toFixed(1)}</span>
-                        </td>
-                        <td class="py-3 pr-4">
-                            ${s.cooldown ? '<span class="badge badge-yellow">COOLING</span>' : '<span class="badge bg-slate-700 text-slate-400">READY</span>'}
-                        </td>
-                        <td class="py-3">
-                            <span class="badge ${isActive ? 'badge-green' : 'badge-red'}">${isActive ? 'GREEN' : 'RED'}</span>
-                        </td>
-                    </tr>`;
-                }).join("");
-
-                // History table
-                const tbody = document.getElementById("hist-tbody");
-                tbody.innerHTML = hist.map(r => `
+            // History table
+            const tbody = document.getElementById("hist-tbody");
+            tbody.innerHTML = hist.map(r => `
             <tr class="hover:bg-white/3 transition-colors">
                 <td class="py-3 pr-4 text-xs text-slate-400">${new Date(r.timestamp).toLocaleString()}</td>
                 <td class="py-3 pr-4"><span class="badge ${r.is_override ? 'badge-yellow' : 'badge-green'} font-mono">LANE ${r.active_lane}</span></td>
@@ -391,6 +563,14 @@
                 <td class="py-3 pr-4 text-xs text-slate-400">${r.reason}</td>
                 <td class="py-3"><span class="badge ${r.is_override ? 'badge-yellow' : 'badge-blue'}">${r.is_override ? 'Override' : 'AI Engine'}</span></td>
             </tr>`).join("");
+        }
+
+        async function loadAll() {
+            try {
+                const [sig, snap, hist] = await Promise.all([
+                    API.currentSignal(), API.trafficSnapshot(), API.signalHistory(30)
+                ]);
+                updateUI(sig, snap, hist);
             } catch (e) { console.error(e); }
         }
 
